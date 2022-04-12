@@ -1,0 +1,123 @@
+#include<stdio.h>
+#include<stdlib.h>
+
+// Node Initialization
+struct node
+    {
+        int data;
+        struct node *left_child, *right_child;
+    };
+    
+
+struct node *create_node(int data)
+    {
+        struct node *temp = (struct node *)malloc(sizeof(struct node));
+        temp->data = data;
+        temp->left_child = temp->right_child = NULL;
+        return temp;
+    }
+
+void print(struct node *root_node) // displaying the nodes!
+    {
+        if (root_node != NULL)
+        {
+            print(root_node->left_child);
+            printf("%d \n", root_node->data);
+            print(root_node->right_child);
+        }
+    }
+
+// It will return the pointer to node
+struct node* insert_node(struct node* node, int data) // inserting nodes!
+    {
+        if (node == NULL) return create_node(data);
+        if (data < node->data)
+        {
+            node->left_child = insert_node(node->left_child, data);
+            
+        }
+        else if (data > node->data)
+        {
+            node->right_child = insert_node(node->right_child, data);
+        }
+        return node;
+    }
+
+//function to find the minimum value in a node
+struct node* find_minimum(struct node *root)
+{
+    if(root == NULL)
+        return NULL;
+    else if(root->left_child != NULL) // node with minimum value will have no left child
+        return find_minimum(root->left_child); // left most element will be minimum
+    return root;
+}
+
+ // function to delete a node
+struct node* delete_node(struct node *node, int data)
+{
+    //searching for the item to be deleted
+    if(node==NULL)
+        return NULL;
+    if (data > node->data)
+        node->right_child = delete_node(node->right_child, data);
+    else if(data < node->data)
+        node->left_child = delete_node(node->left_child, data);
+    else
+    {
+        //No Children
+        if(node->left_child==NULL && node->right_child==NULL)
+        {
+            free(node);
+            return NULL;
+        }
+
+        //One Child
+        else if(node->left_child==NULL || node->right_child==NULL)
+        {
+            struct node *temp;
+            if(node->left_child==NULL)
+                temp = node->right_child;
+            else
+                temp = node->left_child;
+            free(node);
+            return temp;
+        }
+
+        //Two Children
+        else
+        {
+            struct node *temp = find_minimum(node->right_child);
+            node->data = temp->data;
+            node->right_child = delete_node(node->right_child, temp->data);
+        }
+    }
+    return node;
+}   
+    
+    
+int main()
+{
+    printf("Implementation of a Binary Tree in C!\n\n");
+    struct node *root_node = NULL;
+    root_node = insert_node(root_node, 50);
+    insert_node(root_node, 40);
+    insert_node(root_node, 30);
+    insert_node(root_node, 60);
+    insert_node(root_node, 70);
+    insert_node(root_node, 65);
+    insert_node(root_node, 62);
+    insert_node(root_node, 67);
+    insert_node(root_node, 80);
+    insert_node(root_node, 75);
+    insert_node(root_node, 95);
+    insert_node(root_node, 85);
+    insert_node(root_node, 95);
+    print(root_node);
+    printf("******Before Delete************\n");
+    delete_node(root_node, 30);
+    delete_node(root_node, 40);
+    delete_node(root_node, 70);
+    print(root_node);
+    return 0;
+}
